@@ -18,8 +18,8 @@ This repository contains a Counter-Strike 2 external cheat written in C#. The ch
 
 1. Clone the repository:
    ```sh
-   git clone https://github.com/borsuczyna/CS2-C-External-Cheat.git
-   cd CS2-C-External-Cheat
+   git clone https://github.com/borsuczyna/CS2-External-Cheat.git
+   cd CS2-External-Cheat
    ```
 
 2. Install the required .NET SDK:
