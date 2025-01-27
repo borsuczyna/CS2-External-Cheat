@@ -60,7 +60,9 @@ public class Esp
                 continue;
 
             entity.UpdateBonePos();
-            DrawBox(overlay, gfx, entity, viewMatrix);
+
+            if (entity.Team != localPlayer.Team || Config.Esp.FriendlyFire)
+                DrawBox(overlay, gfx, entity, viewMatrix);
         }
 
         await Task.CompletedTask;

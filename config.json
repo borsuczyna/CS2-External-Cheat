@@ -1,12 +1,13 @@
 {
   "TriggerBot": {
-    "FriendlyFire": true,
+    "FriendlyFire": false,
     "ShotDelay": 50,
     "DelayBetweenShots": 100,
     "Key": "LAlt"
   },
   "Esp": {
     "Box": false,
-    "Bones": true
+    "Bones": true,
+    "FriendlyFire": false
   }
 }

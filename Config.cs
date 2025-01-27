@@ -6,7 +6,7 @@ public static class Config
 {
     public static class TriggerBot
     {
-        public static bool FriendlyFire = true;
+        public static bool FriendlyFire = false;
         public static int ShotDelay = 70;
         public static int DelayBetweenShots = 160;
         public static string Key = "LAlt";
@@ -16,6 +16,7 @@ public static class Config
     {
         public static bool Box = false;
         public static bool Bones = true;
+        public static bool FriendlyFire = false;
     }
 
     public static void LoadConfig()
@@ -26,6 +27,8 @@ public static class Config
             {
                 var json = File.ReadAllText("config.json");
                 var config = JsonConvert.DeserializeObject<ConfigFile>(json);
+                if (config == null)
+                    throw new Exception("Failed to deserialize config.");
 
                 TriggerBot.FriendlyFire = config.TriggerBot.FriendlyFire;
                 TriggerBot.ShotDelay = config.TriggerBot.ShotDelay;
@@ -34,6 +37,7 @@ public static class Config
 
                 Esp.Box = config.Esp.Box;
                 Esp.Bones = config.Esp.Bones;
+                Esp.FriendlyFire = config.Esp.FriendlyFire;
             }
             else
             {
@@ -62,7 +66,8 @@ public static class Config
                 Esp = new EspConfig
                 {
                     Box = Esp.Box,
-                    Bones = Esp.Bones
+                    Bones = Esp.Bones,
+                    FriendlyFire = TriggerBot.FriendlyFire
                 }
             };
 
@@ -93,5 +98,6 @@ public static class Config
     {
         public bool Box { get; set; }
         public bool Bones { get; set; }
+        public bool FriendlyFire { get; set; }
     }
 }
