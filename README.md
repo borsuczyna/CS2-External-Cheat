@@ -27,7 +27,9 @@ This repository contains a Counter-Strike 2 external cheat written in C#. The ch
    dotnet --version
    ```
 
-3. Run the project:
+3. Open CS2 in window node
+
+4. Run the project:
    ```sh
    dotnet run
    ```
