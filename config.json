@@ -1,0 +1,11 @@
+{
+  "TriggerBot": {
+    "FriendlyFire": true,
+    "ShotDelay": 50,
+    "DelayBetweenShots": 100
+  },
+  "Esp": {
+    "Box": false,
+    "Bones": true
+  }
+}
