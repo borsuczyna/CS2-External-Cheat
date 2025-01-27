@@ -2,7 +2,8 @@
   "TriggerBot": {
     "FriendlyFire": true,
     "ShotDelay": 50,
-    "DelayBetweenShots": 100
+    "DelayBetweenShots": 100,
+    "Key": "LAlt"
   },
   "Esp": {
     "Box": false,

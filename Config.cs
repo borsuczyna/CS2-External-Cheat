@@ -9,6 +9,7 @@ public static class Config
         public static bool FriendlyFire = true;
         public static int ShotDelay = 70;
         public static int DelayBetweenShots = 160;
+        public static string Key = "LAlt";
     }
 
     public static class Esp
@@ -29,6 +30,7 @@ public static class Config
                 TriggerBot.FriendlyFire = config.TriggerBot.FriendlyFire;
                 TriggerBot.ShotDelay = config.TriggerBot.ShotDelay;
                 TriggerBot.DelayBetweenShots = config.TriggerBot.DelayBetweenShots;
+                TriggerBot.Key = config.TriggerBot.Key;
 
                 Esp.Box = config.Esp.Box;
                 Esp.Bones = config.Esp.Bones;
@@ -54,7 +56,8 @@ public static class Config
                 {
                     FriendlyFire = TriggerBot.FriendlyFire,
                     ShotDelay = TriggerBot.ShotDelay,
-                    DelayBetweenShots = TriggerBot.DelayBetweenShots
+                    DelayBetweenShots = TriggerBot.DelayBetweenShots,
+                    Key = TriggerBot.Key
                 },
                 Esp = new EspConfig
                 {
@@ -83,6 +86,7 @@ public static class Config
         public bool FriendlyFire { get; set; }
         public int ShotDelay { get; set; }
         public int DelayBetweenShots { get; set; }
+        public string Key { get; set; } = "LAlt";
     }
 
     private class EspConfig
