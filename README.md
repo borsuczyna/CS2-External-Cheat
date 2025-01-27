@@ -1,4 +1,4 @@
-# CS2-C-External-Cheat
+# CS2 C# External Cheat
 
 This repository contains a Counter-Strike 2 external cheat written in C#. The cheat includes features such as TriggerBot and ESP (Extra Sensory Perception) with automatic offset updates.
 
