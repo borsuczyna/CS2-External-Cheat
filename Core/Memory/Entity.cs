@@ -48,6 +48,26 @@ public class Entity
         { "ankle_R", Vector3.Zero }
     };
 
+    public static readonly List<(string, string)> BoneConnections = new()
+    {
+        ("head", "neck_0"),
+        ("neck_0", "spine_1"),
+        ("spine_1", "spine_2"),
+        ("spine_2", "pelvis"),
+        ("spine_1", "arm_upper_L"),
+        ("arm_upper_L", "arm_lower_L"),
+        ("arm_lower_L", "hand_L"),
+        ("spine_1", "arm_upper_R"),
+        ("arm_upper_R", "arm_lower_R"),
+        ("arm_lower_R", "hand_R"),
+        ("pelvis", "leg_upper_L"),
+        ("leg_upper_L", "leg_lower_L"),
+        ("leg_lower_L", "ankle_L"),
+        ("pelvis", "leg_upper_R"),
+        ("leg_upper_R", "leg_lower_R"),
+        ("leg_lower_R", "ankle_R")
+    };
+
     public Entity(IntPtr controllerBase, IntPtr addressBase)
     {
         ControllerBase = controllerBase;
@@ -88,7 +108,7 @@ public class Entity
         }
     }
 
-    public int EntityId
+    public int AimingAtEntityId
     {
         get
         {

@@ -151,7 +151,7 @@ public class TriggerBot
         if (Shooting || DateTime.Now.Subtract(LastShot).TotalMilliseconds < Config.TriggerBot.DelayBetweenShots)
             return;
 
-        var entityId = localPlayer.EntityId;
+        var entityId = localPlayer.AimingAtEntityId;
 
         if (entityId > 0)
         {
