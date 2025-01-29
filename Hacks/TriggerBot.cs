@@ -141,6 +141,9 @@ public class TriggerBot
             return;
         }
 
+        if (!Config.TriggerBot.Enabled)
+            return;
+
         var key = keyMap.ContainsKey(Config.TriggerBot.Key) ? keyMap[Config.TriggerBot.Key] : 0;
         if (key == 0)
             return;
