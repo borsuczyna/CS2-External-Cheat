@@ -1,5 +1,6 @@
 {
   "TriggerBot": {
+    "Enabled": true,
     "FriendlyFire": false,
     "ShotDelay": 0,
     "DelayBetweenShots": 100,
