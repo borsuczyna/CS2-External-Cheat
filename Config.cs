@@ -6,6 +6,7 @@ public static class Config
 {
     public static class TriggerBot
     {
+        public static bool Enabled = true;
         public static bool FriendlyFire = false;
         public static int ShotDelay = 70;
         public static int DelayBetweenShots = 160;
@@ -58,6 +59,7 @@ public static class Config
             {
                 TriggerBot = new TriggerBotConfig
                 {
+                    Enabled = TriggerBot.Enabled,
                     FriendlyFire = TriggerBot.FriendlyFire,
                     ShotDelay = TriggerBot.ShotDelay,
                     DelayBetweenShots = TriggerBot.DelayBetweenShots,
@@ -88,6 +90,7 @@ public static class Config
 
     private class TriggerBotConfig
     {
+        public bool Enabled { get; set; } = true;
         public bool FriendlyFire { get; set; }
         public int ShotDelay { get; set; }
         public int DelayBetweenShots { get; set; }
