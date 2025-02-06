@@ -1,5 +1,3 @@
-using System;
-using System.IO;
 using Newtonsoft.Json;
 
 public static class Config
@@ -18,6 +16,16 @@ public static class Config
         public static bool Box = false;
         public static bool Bones = true;
         public static bool FriendlyFire = false;
+    }
+
+    public static class Aimbot
+    {
+        public static bool Enabled = true;
+        public static bool FriendlyFire = false;
+        public static string Key = "LAlt";
+        public static string Bone = "head";
+        public static float Smooth = 0.25f;
+        public static int FovInPx = 400;
     }
 
     public static void LoadConfig()
@@ -39,6 +47,12 @@ public static class Config
                 Esp.Box = config.Esp.Box;
                 Esp.Bones = config.Esp.Bones;
                 Esp.FriendlyFire = config.Esp.FriendlyFire;
+
+                Aimbot.FriendlyFire = config.Aimbot.FriendlyFire;
+                Aimbot.Key = config.Aimbot.Key;
+                Aimbot.Bone = config.Aimbot.Bone;
+                Aimbot.Smooth = config.Aimbot.Smooth;
+                Aimbot.FovInPx = config.Aimbot.FovInPx;
             }
             else
             {
@@ -86,6 +100,7 @@ public static class Config
     {
         public TriggerBotConfig TriggerBot { get; set; } = new TriggerBotConfig();
         public EspConfig Esp { get; set; } = new EspConfig();
+        public AimbotConfig Aimbot { get; set; } = new AimbotConfig();
     }
 
     private class TriggerBotConfig
@@ -102,5 +117,15 @@ public static class Config
         public bool Box { get; set; }
         public bool Bones { get; set; }
         public bool FriendlyFire { get; set; }
+    }
+
+    private class AimbotConfig
+    {
+        public bool Enabled { get; set; } = true;
+        public bool FriendlyFire { get; set; }
+        public string Key { get; set; } = "LAlt";
+        public string Bone { get; set; } = "head";
+        public float Smooth { get; set; } = 0.25f;
+        public int FovInPx { get; set; } = 400;
     }
 }

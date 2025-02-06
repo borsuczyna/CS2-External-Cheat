@@ -12,6 +12,16 @@ public class Windows
 		gfx.DrawTextWithBackground(overlay.fonts["consolas"], overlay.colors["green"], overlay.colors["black"], 10, 10, infoText);
 	}
 
+    public static async Task UseBaseHack(Overlay overlay, Graphics gfx, System.Drawing.Point cursorPos)
+    {
+        await BaseHack.Loop();
+    }
+
+    public static async Task UseAimbot(Overlay overlay, Graphics gfx, System.Drawing.Point cursorPos)
+    {
+        await Aimbot.Loop(overlay, gfx);
+    }
+
     public static async Task UseTriggerBot(Overlay overlay, Graphics gfx, System.Drawing.Point cursorPos)
     {
         await TriggerBot.Loop();

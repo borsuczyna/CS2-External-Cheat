@@ -9,7 +9,7 @@ using GameOverlay.Windows;
 public class Overlay : IDisposable
 {
 	public readonly GraphicsWindow _window;
-	public readonly System.Diagnostics.Process? _process;
+	public static System.Diagnostics.Process? _process;
 	public readonly DateTime _start = DateTime.Now;
 
 	public readonly Dictionary<string, SolidBrush> colors;
@@ -102,8 +102,17 @@ public class Overlay : IDisposable
 
 		var cursorPos = ProcessHelper.GetCursorPosition(_process);
 		Windows.DrawWatermark(this, gfx, cursorPos);
+		_ = Windows.UseBaseHack(this, gfx, cursorPos);
+		_ = Windows.UseAimbot(this, gfx, cursorPos);
 		_ = Windows.UseTriggerBot(this, gfx, cursorPos);
 		_ = Windows.DrawEsp(this, gfx, cursorPos);
+	}
+
+	public static System.Drawing.Point GetCursorPosition()
+	{
+		if (_process == null) return System.Drawing.Point.Empty;
+		
+		return ProcessHelper.GetCursorPosition(_process);
 	}
 
 	private void LoadFonts(Graphics gfx)

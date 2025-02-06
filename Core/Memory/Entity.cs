@@ -108,6 +108,24 @@ public class Entity
         }
     }
 
+    
+    public int Health2
+    {
+        get
+        {
+            try
+            {
+                var m_iHealth = Globals.ClientOffsets!.Read<int>("client.dll:classes:C_BaseEntity:fields:m_iHealth");
+                return Globals.MemoryReader!.ReadInt(AddressBase + m_iHealth);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Error reading entity health: {e.Message}");
+                return 0;
+            }
+        }
+    }
+
     public int AimingAtEntityId
     {
         get

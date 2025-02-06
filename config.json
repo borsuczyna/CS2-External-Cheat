@@ -3,12 +3,20 @@
     "Enabled": true,
     "FriendlyFire": false,
     "ShotDelay": 0,
-    "DelayBetweenShots": 100,
+    "DelayBetweenShots": 150,
     "Key": "LAlt"
   },
   "Esp": {
     "Box": false,
     "Bones": true,
     "FriendlyFire": false
+  },
+  "Aimbot": {
+    "Enabled": true,
+    "FriendlyFire": false,
+    "Key": "LAlt",
+    "Bone": "head",
+    "Smooth": 0.25,
+    "FovInPx": 400
   }
 }
