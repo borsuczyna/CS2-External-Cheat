@@ -2,7 +2,6 @@ namespace CS2.Core;
 
 using System;
 using System.Collections.Generic;
-using System.Text;
 using GameOverlay.Drawing;
 using GameOverlay.Windows;
 
@@ -11,15 +10,18 @@ public class Overlay : IDisposable
 	public readonly GraphicsWindow _window;
 	public static System.Diagnostics.Process? _process;
 	public readonly DateTime _start = DateTime.Now;
+	public static Graphics? gfx;
 
 	public readonly Dictionary<string, SolidBrush> colors;
-	private readonly Dictionary<string, (int, int, int)> _colorsToLoad = new()
+	private readonly Dictionary<string, (int, int, int, int?)> _colorsToLoad = new()
 	{
-		["black"] = (0, 0, 0),
-		["white"] = (255, 255, 255),
-		["red"] = (255, 0, 0),
-		["green"] = (0, 255, 0),
-		["blue"] = (0, 0, 255),
+		["black"] = (0, 0, 0, null),
+		["white"] = (255, 255, 255, null),
+		["red"] = (255, 0, 0, 100),
+		["green"] = (0, 255, 0, null),
+		["blue"] = (0, 0, 255, null),
+		["background"] = (25, 25, 25, 255),
+		["background-border"] = (15, 15, 15, 255),
 	};
 
 	public readonly Dictionary<string, Font> fonts;
@@ -41,7 +43,7 @@ public class Overlay : IDisposable
 			throw new Exception($"[Overlay.cs] Failed to initialize overlay for process '{processName}'.");
 		}
 
-		var gfx = new Graphics()
+		gfx = new Graphics()
 		{
 			MeasureFPS = true,
 			PerPrimitiveAntiAliasing = true,
@@ -65,6 +67,9 @@ public class Overlay : IDisposable
 		_window.Create();
 		_window.Join();
 	}
+	
+	public static int? Width => gfx?.Width;
+	public static int? Height => gfx?.Height;
 
 	private void _window_SetupGraphics(object? sender, SetupGraphicsEventArgs e)
 	{
@@ -101,11 +106,13 @@ public class Overlay : IDisposable
 		if (!ProcessHelper.IsProcessActiveWindow(_process)) return;
 
 		var cursorPos = ProcessHelper.GetCursorPosition(_process);
-		Windows.DrawWatermark(this, gfx, cursorPos);
 		_ = Windows.UseBaseHack(this, gfx, cursorPos);
 		_ = Windows.UseAimbot(this, gfx, cursorPos);
 		_ = Windows.UseTriggerBot(this, gfx, cursorPos);
 		_ = Windows.DrawEsp(this, gfx, cursorPos);
+		
+		Windows.DrawWatermark(this, gfx, cursorPos);
+		Settings.DrawSettings(this, gfx, cursorPos);
 	}
 
 	public static System.Drawing.Point GetCursorPosition()
@@ -127,7 +134,7 @@ public class Overlay : IDisposable
 	{
 		foreach (var pair in _colorsToLoad)
 		{	
-			colors[pair.Key] = gfx.CreateSolidBrush(pair.Value.Item1, pair.Value.Item2, pair.Value.Item3);
+			colors[pair.Key] = gfx.CreateSolidBrush(pair.Value.Item1, pair.Value.Item2, pair.Value.Item3, pair.Value.Item4 ?? 255);
 		}
 	}
 

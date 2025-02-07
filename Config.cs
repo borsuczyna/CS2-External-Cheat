@@ -2,6 +2,8 @@ using Newtonsoft.Json;
 
 public static class Config
 {
+    public static string MenuKey = "Insert";
+
     public static class TriggerBot
     {
         public static bool Enabled = true;
@@ -39,6 +41,9 @@ public static class Config
                 if (config == null)
                     throw new Exception("Failed to deserialize config.");
 
+                MenuKey = config.MenuKey;
+
+                TriggerBot.Enabled = config.TriggerBot.Enabled;
                 TriggerBot.FriendlyFire = config.TriggerBot.FriendlyFire;
                 TriggerBot.ShotDelay = config.TriggerBot.ShotDelay;
                 TriggerBot.DelayBetweenShots = config.TriggerBot.DelayBetweenShots;
@@ -71,6 +76,16 @@ public static class Config
         {
             var config = new ConfigFile
             {
+                MenuKey = MenuKey,
+                Aimbot = new AimbotConfig
+                {
+                    Enabled = Aimbot.Enabled,
+                    FriendlyFire = Aimbot.FriendlyFire,
+                    Key = Aimbot.Key,
+                    Bone = Aimbot.Bone,
+                    Smooth = Aimbot.Smooth,
+                    FovInPx = Aimbot.FovInPx
+                },
                 TriggerBot = new TriggerBotConfig
                 {
                     Enabled = TriggerBot.Enabled,
@@ -98,6 +113,7 @@ public static class Config
 
     private class ConfigFile
     {
+        public string MenuKey { get; set; } = "Insert";
         public TriggerBotConfig TriggerBot { get; set; } = new TriggerBotConfig();
         public EspConfig Esp { get; set; } = new EspConfig();
         public AimbotConfig Aimbot { get; set; } = new AimbotConfig();

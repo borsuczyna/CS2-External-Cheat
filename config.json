@@ -1,9 +1,10 @@
 {
+  "MenuKey": "Insert",
   "TriggerBot": {
     "Enabled": true,
     "FriendlyFire": false,
     "ShotDelay": 0,
-    "DelayBetweenShots": 150,
+    "DelayBetweenShots": 350,
     "Key": "LAlt"
   },
   "Esp": {
@@ -16,7 +17,7 @@
     "FriendlyFire": false,
     "Key": "LAlt",
     "Bone": "head",
-    "Smooth": 0.25,
+    "Smooth": 0.22857143,
     "FovInPx": 400
   }
 }

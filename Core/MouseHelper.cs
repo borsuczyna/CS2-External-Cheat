@@ -1,6 +1,13 @@
 using System;
 using System.Runtime.InteropServices;
 
+public enum MouseKey
+{
+    Left,
+    Right,
+    Middle
+}
+
 public class MouseHelper
 {
     [StructLayout(LayoutKind.Sequential)]
@@ -23,14 +30,18 @@ public class MouseHelper
 
     const int INPUT_MOUSE = 0;
     const int MOUSEEVENTF_MOVE = 0x0001;
+    const int VK_LBUTTON = 0x01; // Left mouse button virtual-key code
 
     [DllImport("user32.dll", SetLastError = true)]
     static extern uint SendInput(uint nInputs, INPUT[] pInputs, int cbSize);
 
+    [DllImport("user32.dll")]
+    static extern short GetAsyncKeyState(int vKey);
+
     public static void MoveMouseRelative(int deltaX, int deltaY)
     {
         INPUT[] inputs =
-        [
+        {
             new INPUT
             {
                 type = INPUT_MOUSE,
@@ -41,8 +52,19 @@ public class MouseHelper
                     dwFlags = MOUSEEVENTF_MOVE
                 }
             }
-        ];
+        };
 
         SendInput((uint)inputs.Length, inputs, Marshal.SizeOf(typeof(INPUT)));
+    }
+
+    public static bool IsMouseDown(MouseKey key)
+    {
+        return GetAsyncKeyState(key switch
+        {
+            MouseKey.Left => VK_LBUTTON,
+            MouseKey.Right => 0x02, // Right mouse button virtual-key code
+            MouseKey.Middle => 0x04, // Middle mouse button virtual-key code
+            _ => throw new ArgumentOutOfRangeException(nameof(key))
+        }) < 0;
     }
 }

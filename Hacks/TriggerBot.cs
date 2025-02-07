@@ -1,7 +1,3 @@
-using System.Windows.Input;
-using System.Runtime.InteropServices;
-using System.Diagnostics;
-
 namespace CS2.Hacks;
 
 public class TriggerBot

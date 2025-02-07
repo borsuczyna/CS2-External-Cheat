@@ -7,6 +7,8 @@ namespace CS2.Hacks;
 
 public class Aimbot
 {
+    public static DateTime LastShot = DateTime.Now;
+
     public static async Task Loop(Overlay overlay, Graphics gfx)
     {
         if (!Config.Aimbot.Enabled)
@@ -34,6 +36,9 @@ public class Aimbot
         foreach (var entity in entities)
         {
             if (entity.AddressBase == localPlayer.ControllerBase)
+                continue;
+
+            if (!(entity.Team != localPlayer.Team || Config.Esp.FriendlyFire))
                 continue;
 
             if (entity.Health2 <= 0)
