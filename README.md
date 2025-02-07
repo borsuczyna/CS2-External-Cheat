@@ -6,6 +6,8 @@ This repository contains a Counter-Strike 2 external cheat written in C#. The ch
 
 - **TriggerBot**
 - **ESP**
+- **Aimbot**
+- **Settings menu**
 - **Automatic Offset Updates**
 
 ## Getting Started
