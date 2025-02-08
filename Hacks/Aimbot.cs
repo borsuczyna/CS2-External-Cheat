@@ -11,10 +11,6 @@ public class Aimbot
 
     public static async Task Loop(Overlay overlay, Graphics gfx)
     {
-        // var viewAngles = Globals.MemoryReader!.GetViewAngles();
-        // Console.WriteLine(viewAngles[0] + " " + viewAngles[1]);
-        // Globals.MemoryReader!.SetViewAngles([0, 0]);
-
         if (!Config.Aimbot.Enabled)
             return;
 
@@ -60,41 +56,8 @@ public class Aimbot
                 continue;
 
             entity.UpdateBonePos();
-
-            var bonePos = GetBonePosition(gfx, entity, viewMatrix, Config.Aimbot.Bone);
-            if (bonePos == null)
-                continue;
-
-            // var distance = Vector2.Distance(middleOfScreen, new Vector2(bonePos[0], bonePos[1]));
-            // if (distance < closestDistance)
-            // {
-            //     closestEntity = entity;
-            //     closestDistance = distance;
-            //     // closestPos = bonePos;
-            //     closestPos = entity.BonePos[Config.Aimbot.Bone];
-            // }
             entityPositions.Add(entity.BonePos[Config.Aimbot.Bone]);
         }
-
-        // if (closestEntity != null)
-        // {
-        //     var localPos = localPlayer.CameraPos;
-        //     var viewAngle = Globals.MemoryReader!.GetViewAngles();
-        //     var aimPos = closestPos;
-        //     var oppPos = aimPos - localPos;
-
-        //     var distance = Math.Sqrt(Math.Pow(oppPos.X, 2) + Math.Pow(oppPos.Y, 2));
-        //     var yaw = Math.Atan2(oppPos.Y, oppPos.X) * 57.295779513 - viewAngle[1];
-        //     var pitch = -Math.Atan(oppPos.Z / distance) * 57.295779513 - viewAngle[0];
-        //     var norm = Math.Sqrt(Math.Pow(yaw, 2) + Math.Pow(pitch, 2));
-        //     if (norm > Config.Aimbot.Fov)
-        //         return;
-
-        //     yaw = yaw * (1 - Config.Aimbot.Smooth) + viewAngle[1];
-        //     pitch = pitch * (1 - Config.Aimbot.Smooth) + viewAngle[0];
-
-        //     Globals.MemoryReader!.SetViewAngles((float)pitch, (float)yaw);
-        // }
 
         var closestPos = Vector3.Zero;
         var closestYawPitch = Vector2.Zero;
@@ -136,7 +99,6 @@ public class Aimbot
             {
                 yaw -= hitOffset.Y*2;
                 pitch -= hitOffset.X*2;
-                Console.WriteLine($"hitOffset: {hitOffset}");
             }
 
             Globals.MemoryReader!.SetViewAngles(pitch, yaw);

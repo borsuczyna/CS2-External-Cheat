@@ -5,7 +5,7 @@
     "OnKey": true,
     "FriendlyFire": false,
     "ShotDelay": 0,
-    "DelayBetweenShots": 96,
+    "DelayBetweenShots": 95,
     "Key": "LAlt"
   },
   "Esp": {
@@ -21,6 +21,6 @@
     "Key": "LAlt",
     "Bone": "head",
     "Smooth": 0.0,
-    "Fov": 151.2766
+    "Fov": 179.42215
   }
 }
