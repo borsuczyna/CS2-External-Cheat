@@ -11,15 +11,34 @@ public class Aimbot
 
     public static async Task Loop(Overlay overlay, Graphics gfx)
     {
+        // var viewAngles = Globals.MemoryReader!.GetViewAngles();
+        // Console.WriteLine(viewAngles[0] + " " + viewAngles[1]);
+        // Globals.MemoryReader!.SetViewAngles([0, 0]);
+
         if (!Config.Aimbot.Enabled)
             return;
 
-        var key = ProcessHelper.keyMap.ContainsKey(Config.Aimbot.Key) ? ProcessHelper.keyMap[Config.Aimbot.Key] : 0;
-        if (key == 0)
+        // draw aim fov
+        var middleOfScreen = new Vector2(gfx.Width / 2, gfx.Height / 2);
+        
+        if (Config.Aimbot.DrawFOV)
+        {
+            var fovInPx = (int)(gfx.Width * Config.Aimbot.Fov / 180) * 1.3f;
+            gfx.DrawCircle(overlay.colors["green"], middleOfScreen.X, middleOfScreen.Y, fovInPx, 2);
+        }
+
+        if (Settings._menuOpen)
             return;
 
-        if (ProcessHelper.GetAsyncKeyState(key) == 0)
-            return;
+        if (Config.Aimbot.OnKey)
+        {
+            var key = ProcessHelper.keyMap.ContainsKey(Config.Aimbot.Key) ? ProcessHelper.keyMap[Config.Aimbot.Key] : 0;
+            if (key == 0)
+                return;
+
+            if (ProcessHelper.GetAsyncKeyState(key) == 0)
+                return;
+        }
 
         var localPlayer = Globals.MemoryReader!.GetLocalPlayer();
         if (localPlayer == null)
@@ -27,11 +46,7 @@ public class Aimbot
 
         var entities = Globals.MemoryReader!.GetEntities();
         var viewMatrix = Globals.MemoryReader!.GetViewMatrix();
-
-        Entity? closestEntity = null;
-        float closestDistance = Config.Aimbot.FovInPx;
-        var closestPos = new int[] { -999, -999 };
-        var middleOfScreen = new Vector2(gfx.Width / 2, gfx.Height / 2);
+        var entityPositions = new List<Vector3>();
 
         foreach (var entity in entities)
         {
@@ -50,33 +65,81 @@ public class Aimbot
             if (bonePos == null)
                 continue;
 
-            var distance = Vector2.Distance(middleOfScreen, new Vector2(bonePos[0], bonePos[1]));
-            if (distance < closestDistance)
+            // var distance = Vector2.Distance(middleOfScreen, new Vector2(bonePos[0], bonePos[1]));
+            // if (distance < closestDistance)
+            // {
+            //     closestEntity = entity;
+            //     closestDistance = distance;
+            //     // closestPos = bonePos;
+            //     closestPos = entity.BonePos[Config.Aimbot.Bone];
+            // }
+            entityPositions.Add(entity.BonePos[Config.Aimbot.Bone]);
+        }
+
+        // if (closestEntity != null)
+        // {
+        //     var localPos = localPlayer.CameraPos;
+        //     var viewAngle = Globals.MemoryReader!.GetViewAngles();
+        //     var aimPos = closestPos;
+        //     var oppPos = aimPos - localPos;
+
+        //     var distance = Math.Sqrt(Math.Pow(oppPos.X, 2) + Math.Pow(oppPos.Y, 2));
+        //     var yaw = Math.Atan2(oppPos.Y, oppPos.X) * 57.295779513 - viewAngle[1];
+        //     var pitch = -Math.Atan(oppPos.Z / distance) * 57.295779513 - viewAngle[0];
+        //     var norm = Math.Sqrt(Math.Pow(yaw, 2) + Math.Pow(pitch, 2));
+        //     if (norm > Config.Aimbot.Fov)
+        //         return;
+
+        //     yaw = yaw * (1 - Config.Aimbot.Smooth) + viewAngle[1];
+        //     pitch = pitch * (1 - Config.Aimbot.Smooth) + viewAngle[0];
+
+        //     Globals.MemoryReader!.SetViewAngles((float)pitch, (float)yaw);
+        // }
+
+        var closestPos = Vector3.Zero;
+        var closestYawPitch = Vector2.Zero;
+        var closestDistance = Config.Aimbot.Fov;
+
+        foreach (var pos in entityPositions)
+        {
+            var localPos = localPlayer.CameraPos;
+            var viewAngle = Globals.MemoryReader!.GetViewAngles();
+            var aimPos = pos;
+            var oppPos = aimPos - localPos;
+
+            var distance = Math.Sqrt(Math.Pow(oppPos.X, 2) + Math.Pow(oppPos.Y, 2));
+            var yaw = Math.Atan2(oppPos.Y, oppPos.X) * 57.295779513 - viewAngle[1];
+            var pitch = -Math.Atan(oppPos.Z / distance) * 57.295779513 - viewAngle[0];
+            var norm = Math.Sqrt(Math.Pow(yaw, 2) + Math.Pow(pitch, 2));
+            if (norm > Config.Aimbot.Fov)
+                continue;
+
+            if (norm < closestDistance)
             {
-                closestEntity = entity;
-                closestDistance = distance;
-                closestPos = bonePos;
+                closestPos = pos;
+                closestYawPitch = new Vector2((float)pitch, (float)yaw);
+                closestDistance = (float)norm;
             }
         }
 
-        if (closestEntity != null)
+        if (closestPos != Vector3.Zero)
         {
-            var difference = new Vector2(closestPos[0], closestPos[1]) - middleOfScreen;
+            var viewAngle = Globals.MemoryReader!.GetViewAngles();
+            var pitch = closestYawPitch.X;
+            var yaw = closestYawPitch.Y;
 
-            var x = difference.X * Config.Aimbot.Smooth;
-            var y = difference.Y * Config.Aimbot.Smooth;
-            // add min threshold to 0.1
-            if (difference.X != 0 && (int)x == 0)
+            yaw = yaw * (1 - Config.Aimbot.Smooth) + viewAngle[1];
+            pitch = pitch * (1 - Config.Aimbot.Smooth) + viewAngle[0];
+
+            var hitOffset = localPlayer.HitOffset;
+            if (hitOffset != Vector2.Zero)
             {
-                x = difference.X > 0 ? 1 : -1;
+                yaw -= hitOffset.Y*2;
+                pitch -= hitOffset.X*2;
+                Console.WriteLine($"hitOffset: {hitOffset}");
             }
 
-            if (difference.Y != 0 && (int)y == 0)
-            {
-                y = difference.Y > 0 ? 1 : -1;
-            }
-
-            MouseHelper.MoveMouseRelative((int)x, (int)y);
+            Globals.MemoryReader!.SetViewAngles(pitch, yaw);
         }
 
         await Task.CompletedTask;

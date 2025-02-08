@@ -6,13 +6,13 @@ namespace CS2.Core;
 
 public class Settings
 {
-    private static bool _menuOpen = false;
+    public static bool _menuOpen = false;
     private static DateTime _lastMenuInteraction = DateTime.Now;
 
     private static int _x = 300;
     private static int _y = 100;
     private static int _width = 200;
-    private static int _height = 250;
+    private static int _height = 300;
 
     private static string _currentOpenMenu = "Triggerbot";
 
@@ -42,7 +42,7 @@ public class Settings
         Windows.DrawWindow("Settings", _x, _y, _width, _height, overlay, gfx);
         (_x, _y) = Windows.MoveWindow("settings", _x, _y, _width, _height);
         (_width, _height) = Windows.ResizeWindow("settings", _x, _y, _width, _height, overlay, gfx);
-        (_width, _height) = (Math.Max(_width, 400), Math.Max(_height, 250));
+        (_width, _height) = (Math.Max(_width, 400), Math.Max(_height, 300));
 
         // left side menu select
         // Windows.DrawRectangle(gfx, _x + 10, _y + 30, 180, 20, overlay.colors["black"]);
@@ -79,19 +79,22 @@ public class Settings
         if (_currentOpenMenu == "Triggerbot")
         {
             Windows.DrawCheckbox("Triggerbot Enabled", _x + 210, _y + 30, ref Config.TriggerBot.Enabled, overlay, gfx);
-            Windows.DrawCheckbox("Friendly Fire", _x + 210, _y + 60, ref Config.TriggerBot.FriendlyFire, overlay, gfx);
-            Windows.DrawSlider("Shot Delay", _x + 210, _y + 90, _width - 220, 20, ref Config.TriggerBot.ShotDelay, 0, 1000, overlay, gfx);
-            Windows.DrawSlider("Delay Between Shots", _x + 210, _y + 120, _width - 220, 20, ref Config.TriggerBot.DelayBetweenShots, 0, 1000, overlay, gfx);
-            Windows.DrawSelect("Triggerbot key", _x + 210, _y + 145, _width - 220, 20, ref Config.TriggerBot.Key, ProcessHelper.keyMap.Keys.ToList(), ref _triggerBotKeyOpen, ref _triggerBotKeyScrollPos, 10, overlay, gfx);
+            Windows.DrawCheckbox("On key only", _x + 210, _y + 60, ref Config.TriggerBot.OnKey, overlay, gfx);
+            Windows.DrawCheckbox("Friendly Fire", _x + 210, _y + 90, ref Config.TriggerBot.FriendlyFire, overlay, gfx);
+            Windows.DrawSlider("Shot Delay", _x + 210, _y + 120, _width - 220, 20, ref Config.TriggerBot.ShotDelay, 0, 1000, overlay, gfx);
+            Windows.DrawSlider("Delay Between Shots", _x + 210, _y + 150, _width - 220, 20, ref Config.TriggerBot.DelayBetweenShots, 0, 1000, overlay, gfx);
+            Windows.DrawSelect("Triggerbot key", _x + 210, _y + 175, _width - 220, 20, ref Config.TriggerBot.Key, ProcessHelper.keyMap.Keys.ToList(), ref _triggerBotKeyOpen, ref _triggerBotKeyScrollPos, 10, overlay, gfx);
         }
         else if (_currentOpenMenu == "Aimbot")
         {
             Windows.DrawCheckbox("Aimbot Enabled", _x + 210, _y + 30, ref Config.Aimbot.Enabled, overlay, gfx);
-            Windows.DrawCheckbox("Friendly Fire", _x + 210, _y + 60, ref Config.Aimbot.FriendlyFire, overlay, gfx);
-            Windows.DrawSlider("Aimbot smooth", _x + 210, _y + 180, _width - 220, 20, ref Config.Aimbot.Smooth, 0, 1, overlay, gfx);
-            Windows.DrawSlider("Aimbot FOV", _x + 210, _y + 205, _width - 220, 20, ref Config.Aimbot.FovInPx, 0, 1000, overlay, gfx);
-            Windows.DrawSelect("Aimbot bone", _x + 210, _y + 135, _width - 220, 20, ref Config.Aimbot.Bone, Entity.BoneOffsets.Keys.ToList(), ref _aimbotBoneOpen, ref _aimbotBoneScrollPos, 10, overlay, gfx);
-            Windows.DrawSelect("Aimbot key", _x + 210, _y + 90, _width - 220, 20, ref Config.Aimbot.Key, ProcessHelper.keyMap.Keys.ToList(), ref _aimbotKeyOpen, ref _aimbotKeyScrollPos, 10, overlay, gfx);
+            Windows.DrawCheckbox("On key only", _x + 210, _y + 60, ref Config.Aimbot.OnKey, overlay, gfx);
+            Windows.DrawCheckbox("Draw FOV", _x + 210, _y + 90, ref Config.Aimbot.DrawFOV, overlay, gfx);
+            Windows.DrawCheckbox("Friendly Fire", _x + 210, _y + 120, ref Config.Aimbot.FriendlyFire, overlay, gfx);
+            Windows.DrawSlider("Aimbot smooth", _x + 210, _y + 240, _width - 220, 20, ref Config.Aimbot.Smooth, 0, 1, overlay, gfx);
+            Windows.DrawSlider("Aimbot FOV", _x + 210, _y + 265, _width - 220, 20, ref Config.Aimbot.Fov, 0, 180, overlay, gfx);
+            Windows.DrawSelect("Aimbot bone", _x + 210, _y + 195, _width - 220, 20, ref Config.Aimbot.Bone, Entity.BoneOffsets.Keys.ToList(), ref _aimbotBoneOpen, ref _aimbotBoneScrollPos, 10, overlay, gfx);
+            Windows.DrawSelect("Aimbot key", _x + 210, _y + 150, _width - 220, 20, ref Config.Aimbot.Key, ProcessHelper.keyMap.Keys.ToList(), ref _aimbotKeyOpen, ref _aimbotKeyScrollPos, 10, overlay, gfx);
         }
         else if (_currentOpenMenu == "ESP")
         {

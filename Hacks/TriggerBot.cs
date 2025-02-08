@@ -14,12 +14,15 @@ public class TriggerBot
         if (!Config.TriggerBot.Enabled)
             return;
 
-        var key = ProcessHelper.keyMap.ContainsKey(Config.TriggerBot.Key) ? ProcessHelper.keyMap[Config.TriggerBot.Key] : 0;
-        if (key == 0)
-            return;
+        if (Config.TriggerBot.OnKey)
+        {
+            var key = ProcessHelper.keyMap.ContainsKey(Config.TriggerBot.Key) ? ProcessHelper.keyMap[Config.TriggerBot.Key] : 0;
+            if (key == 0)
+                return;
 
-        if (ProcessHelper.GetAsyncKeyState(key) == 0)
-            return;
+            if (ProcessHelper.GetAsyncKeyState(key) == 0)
+                return;
+        }
 
         if (Shooting || DateTime.Now.Subtract(LastShot).TotalMilliseconds < Config.TriggerBot.DelayBetweenShots)
             return;

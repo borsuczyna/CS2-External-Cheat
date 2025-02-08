@@ -6,6 +6,17 @@ using System.Text;
 
 namespace CS2.Core.Memory;
 
+public struct c_utl_vector
+{
+    public ulong count;
+    public ulong data;
+
+    public override string ToString()
+    {
+        return $"count: {count}, data: {data}";
+    }
+}
+
 public class MemoryReader
 {
     private string _processName;
@@ -19,6 +30,14 @@ public class MemoryReader
         byte[] lpBuffer,
         int dwSize,
         out int lpNumberOfBytesRead);
+
+    [DllImport("kernel32.dll", SetLastError = true)]
+    private static extern bool WriteProcessMemory(
+        IntPtr hProcess,
+        IntPtr lpBaseAddress,
+        byte[] lpBuffer,
+        int nSize,
+        out int lpNumberOfBytesWritten);
 
     public MemoryReader(string processName)
     {
@@ -68,6 +87,17 @@ public class MemoryReader
         return floats;
     }
 
+    public void WriteFloatArray(IntPtr address, float[] floats)
+    {
+        byte[] buffer = new byte[floats.Length * 4]; // A float is 4 bytes
+        for (int i = 0; i < floats.Length; i++)
+        {
+            byte[] floatBytes = BitConverter.GetBytes(floats[i]);
+            Array.Copy(floatBytes, 0, buffer, i * 4, 4);
+        }
+        WriteProcessMemory(processHandle, address, buffer, buffer.Length, out _);
+    }
+
     public int ReadInt(IntPtr address)
     {
         byte[] buffer = new byte[4]; // An int is 4 bytes
@@ -86,6 +116,16 @@ public class MemoryReader
         );
     }
 
+    public Vector2 ReadVector2(IntPtr address)
+    {
+        byte[] buffer = new byte[8]; // A Vector2 is 8 bytes
+        ReadProcessMemory(processHandle, address, buffer, buffer.Length, out _);
+        return new Vector2(
+            BitConverter.ToSingle(buffer, 0),
+            BitConverter.ToSingle(buffer, 4)
+        );
+    }
+
     public string ReadString(IntPtr lpBaseAddress, int maxLength = 256)
     {
         byte[] buffer = new byte[maxLength];
@@ -94,6 +134,17 @@ public class MemoryReader
         return nullCharIndex >= 0
             ? Encoding.UTF8.GetString(buffer, 0, nullCharIndex + 1).Trim()
             : Encoding.UTF8.GetString(buffer).Trim();
+    }
+
+    public c_utl_vector ReadUtlVector(IntPtr address)
+    {
+        byte[] buffer = new byte[16]; // A c_utl_vector is 16 bytes
+        ReadProcessMemory(processHandle, address, buffer, buffer.Length, out _);
+        return new c_utl_vector
+        {
+            count = BitConverter.ToUInt64(buffer, 0),
+            data = BitConverter.ToUInt64(buffer, 8)
+        };
     }
 
     public Entity? GetLocalPlayer()
@@ -192,13 +243,28 @@ public class MemoryReader
         };
     }
 
-    
-
     public float[] GetViewMatrix()
     {
-        var (width, height) = ProcessHelper.GetScreenSize();
         var dwViewMatrixOffset = Globals.Offsets!.Read<int>("client.dll:dwViewMatrix");
         var viewMatrixProjection = ReadFloatArray(GetModuleBase("client.dll") + dwViewMatrixOffset, 16);
         return viewMatrixProjection;
+    }
+
+    // bool PlayerPawn::GetViewAngle()
+    // {
+    //     return GetDataAddressWithOffset<Vec2>(Address, Offset::Pawn.angEyeAngles, this->ViewAngle);
+    // }
+    public float[] GetViewAngles()
+    {
+        var dwViewAnglesOffset = Globals.Offsets!.Read<int>("client.dll:dwViewAngles");
+        var viewAngles = ReadFloatArray(GetModuleBase("client.dll") + dwViewAnglesOffset, 2);
+        return viewAngles;
+    }
+
+    public void SetViewAngles(float x, float y)
+    {
+        var dwViewAnglesOffset = Globals.Offsets!.Read<int>("client.dll:dwViewAngles");
+        var viewAngles = GetModuleBase("client.dll") + dwViewAnglesOffset;
+        WriteFloatArray(viewAngles, [x, y]);
     }
 }

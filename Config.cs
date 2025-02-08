@@ -7,6 +7,7 @@ public static class Config
     public static class TriggerBot
     {
         public static bool Enabled = true;
+        public static bool OnKey = true;
         public static bool FriendlyFire = false;
         public static int ShotDelay = 70;
         public static int DelayBetweenShots = 160;
@@ -23,11 +24,13 @@ public static class Config
     public static class Aimbot
     {
         public static bool Enabled = true;
+        public static bool OnKey = true;
+        public static bool DrawFOV = true;
         public static bool FriendlyFire = false;
         public static string Key = "LAlt";
         public static string Bone = "head";
         public static float Smooth = 0.25f;
-        public static int FovInPx = 400;
+        public static float Fov = 50;
     }
 
     public static void LoadConfig()
@@ -44,6 +47,7 @@ public static class Config
                 MenuKey = config.MenuKey;
 
                 TriggerBot.Enabled = config.TriggerBot.Enabled;
+                TriggerBot.OnKey = config.TriggerBot.OnKey;
                 TriggerBot.FriendlyFire = config.TriggerBot.FriendlyFire;
                 TriggerBot.ShotDelay = config.TriggerBot.ShotDelay;
                 TriggerBot.DelayBetweenShots = config.TriggerBot.DelayBetweenShots;
@@ -54,10 +58,13 @@ public static class Config
                 Esp.FriendlyFire = config.Esp.FriendlyFire;
 
                 Aimbot.FriendlyFire = config.Aimbot.FriendlyFire;
+                Aimbot.OnKey = config.Aimbot.OnKey;
+                Aimbot.DrawFOV = config.Aimbot.DrawFOV;
+                Aimbot.Enabled = config.Aimbot.Enabled;
                 Aimbot.Key = config.Aimbot.Key;
                 Aimbot.Bone = config.Aimbot.Bone;
                 Aimbot.Smooth = config.Aimbot.Smooth;
-                Aimbot.FovInPx = config.Aimbot.FovInPx;
+                Aimbot.Fov = config.Aimbot.Fov;
             }
             else
             {
@@ -80,15 +87,18 @@ public static class Config
                 Aimbot = new AimbotConfig
                 {
                     Enabled = Aimbot.Enabled,
+                    OnKey = Aimbot.OnKey,
+                    DrawFOV = Aimbot.DrawFOV,
                     FriendlyFire = Aimbot.FriendlyFire,
                     Key = Aimbot.Key,
                     Bone = Aimbot.Bone,
                     Smooth = Aimbot.Smooth,
-                    FovInPx = Aimbot.FovInPx
+                    Fov = Aimbot.Fov
                 },
                 TriggerBot = new TriggerBotConfig
                 {
                     Enabled = TriggerBot.Enabled,
+                    OnKey = TriggerBot.OnKey,
                     FriendlyFire = TriggerBot.FriendlyFire,
                     ShotDelay = TriggerBot.ShotDelay,
                     DelayBetweenShots = TriggerBot.DelayBetweenShots,
@@ -122,6 +132,7 @@ public static class Config
     private class TriggerBotConfig
     {
         public bool Enabled { get; set; } = true;
+        public bool OnKey { get; set; } = true;
         public bool FriendlyFire { get; set; }
         public int ShotDelay { get; set; }
         public int DelayBetweenShots { get; set; }
@@ -138,10 +149,12 @@ public static class Config
     private class AimbotConfig
     {
         public bool Enabled { get; set; } = true;
+        public bool OnKey { get; set; } = true;
+        public bool DrawFOV { get; set; } = true;
         public bool FriendlyFire { get; set; }
         public string Key { get; set; } = "LAlt";
         public string Bone { get; set; } = "head";
         public float Smooth { get; set; } = 0.25f;
-        public int FovInPx { get; set; } = 400;
+        public float Fov { get; set; } = 50;
     }
 }
