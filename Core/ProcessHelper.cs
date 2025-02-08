@@ -154,6 +154,17 @@ public static class ProcessHelper
         { "BrowserForward", 0xA7 }
     };
 
+    public static string GetKeyName(int vKey)
+    {
+        // return keyMap.FirstOrDefault(x => x.Value == vKey).Key;
+        return keyMap.ContainsValue(vKey) ? keyMap.FirstOrDefault(x => x.Value == vKey).Key : $"0x{vKey:X}";
+    }
+
+    public static bool IsKeyDown(int key)
+    {
+        return (GetAsyncKeyState(key) & 0x8000) != 0;
+    }
+
     public static Point GetCursorPosition(System.Diagnostics.Process process)
     {
         // Get the cursor position in screen coordinates
@@ -219,6 +230,14 @@ public static class ProcessHelper
         if (!SetCursorPos(x, y))
         {
             throw new Exception("Failed to set cursor position.");
+        }
+    }
+
+    public static void UpdateKeys()
+    {
+        for (int i = 0; i < 256; i++)
+        {
+            IsKeyDown(i);
         }
     }
 }

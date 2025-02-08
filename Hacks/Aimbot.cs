@@ -5,8 +5,21 @@ using GameOverlay.Drawing;
 
 namespace CS2.Hacks;
 
+public class SmoothingMethod
+{
+    public static float Linear(float current, float target, float smooth)
+    {
+        return current + target * smooth;
+    }
+}
+
 public class Aimbot
 {
+    public static Dictionary<string, Delegate> SmoothingMethods = new()
+    {
+        ["Linear"] = new Func<float, float, float, float>(SmoothingMethod.Linear),
+    };
+
     public static DateTime LastShot = DateTime.Now;
 
     public static async Task Loop(Overlay overlay, Graphics gfx)
@@ -23,16 +36,12 @@ public class Aimbot
             gfx.DrawCircle(overlay.colors["green"], middleOfScreen.X, middleOfScreen.Y, fovInPx, 2);
         }
 
-        if (Settings._menuOpen)
+        if (Menu._menuOpen)
             return;
 
         if (Config.Aimbot.OnKey)
         {
-            var key = ProcessHelper.keyMap.ContainsKey(Config.Aimbot.Key) ? ProcessHelper.keyMap[Config.Aimbot.Key] : 0;
-            if (key == 0)
-                return;
-
-            if (ProcessHelper.GetAsyncKeyState(key) == 0)
+            if (!ProcessHelper.IsKeyDown(Config.Aimbot.Key))
                 return;
         }
 
@@ -49,7 +58,7 @@ public class Aimbot
             if (entity.AddressBase == localPlayer.ControllerBase)
                 continue;
 
-            if (!(entity.Team != localPlayer.Team || Config.Esp.FriendlyFire))
+            if (!(entity.Team != localPlayer.Team || Config.Aimbot.FriendlyFire))
                 continue;
 
             if (entity.Health2 <= 0)
@@ -91,15 +100,19 @@ public class Aimbot
             var pitch = closestYawPitch.X;
             var yaw = closestYawPitch.Y;
 
-            yaw = yaw * (1 - Config.Aimbot.Smooth) + viewAngle[1];
-            pitch = pitch * (1 - Config.Aimbot.Smooth) + viewAngle[0];
-
-            var hitOffset = localPlayer.HitOffset;
-            if (hitOffset != Vector2.Zero)
+            if (Config.Aimbot.ControlRecoil)
             {
-                yaw -= hitOffset.Y*2;
-                pitch -= hitOffset.X*2;
+                var hitOffset = localPlayer.HitOffset;
+                if (hitOffset != Vector2.Zero)
+                {
+                    yaw -= hitOffset.Y*2;
+                    pitch -= hitOffset.X*2;
+                }
             }
+            
+            var smoothingMethod = SmoothingMethods.ContainsKey(Config.Aimbot.SmoothingMethod) ? (Func<float, float, float, float>)SmoothingMethods[Config.Aimbot.SmoothingMethod] : SmoothingMethod.Linear;
+            yaw = smoothingMethod(viewAngle[1], yaw, 1 - Config.Aimbot.Smooth);
+            pitch = smoothingMethod(viewAngle[0], pitch, 1 - Config.Aimbot.Smooth);
 
             Globals.MemoryReader!.SetViewAngles(pitch, yaw);
         }

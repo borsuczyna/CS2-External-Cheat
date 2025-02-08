@@ -1,12 +1,12 @@
 {
-  "MenuKey": "Insert",
+  "MenuKey": 45,
   "TriggerBot": {
     "Enabled": true,
     "OnKey": true,
     "FriendlyFire": false,
     "ShotDelay": 0,
     "DelayBetweenShots": 95,
-    "Key": "LAlt"
+    "Key": 18
   },
   "Esp": {
     "Box": false,
@@ -16,11 +16,12 @@
   "Aimbot": {
     "Enabled": true,
     "OnKey": true,
+    "ControlRecoil": true,
     "DrawFOV": true,
     "FriendlyFire": false,
-    "Key": "LAlt",
+    "Key": 18,
     "Bone": "head",
     "Smooth": 0.0,
-    "Fov": 179.42215
+    "Fov": 100.42215
   }
 }

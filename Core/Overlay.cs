@@ -17,17 +17,28 @@ public class Overlay : IDisposable
 	{
 		["black"] = (0, 0, 0, null),
 		["white"] = (255, 255, 255, null),
+		["white2"] = (255, 255, 255, 200),
+		["white3"] = (255, 255, 255, 155),
 		["red"] = (255, 0, 0, 100),
 		["green"] = (0, 255, 0, null),
 		["blue"] = (0, 0, 255, null),
 		["background"] = (25, 25, 25, 255),
 		["background-border"] = (15, 15, 15, 255),
+		["background-dark"] = (29, 31, 32, 255),
+		["background-light"] = (33, 35, 38, 255),
+		["background-light2"] = (40, 42, 45, 255),
+		["background-light3"] = (50, 53, 57, 255),
+		["background-hover"] = (45, 48, 54, 255),
+		["background-hover-transparent"] = (45, 48, 54, 155),
+		["active"] = (113, 213, 255, 255),
+		["active-dark"] = (88, 192, 240, 255),
 	};
 
 	public readonly Dictionary<string, Font> fonts;
 	private readonly Dictionary<string, (string, int)> _fontsToLoad = new()
 	{
 		["consolas"] = ("Consolas", 14),
+		["consolas2"] = ("Consolas", 30),
 		["arial"] = ("Arial", 24),
 	};
 
@@ -53,7 +64,7 @@ public class Overlay : IDisposable
 
 		_window = new StickyWindow(_process.MainWindowHandle, gfx)
 		{
-			FPS = 240,
+			FPS = 2400,
 			IsTopmost = true,
 			IsVisible = true,
 			AttachToClientArea = true,
@@ -106,13 +117,17 @@ public class Overlay : IDisposable
 		if (!ProcessHelper.IsProcessActiveWindow(_process)) return;
 
 		var cursorPos = ProcessHelper.GetCursorPosition(_process);
+		MouseHelper.UpdateMouseDowns();
 		_ = Windows.UseBaseHack(this, gfx, cursorPos);
 		_ = Windows.UseAimbot(this, gfx, cursorPos);
 		_ = Windows.UseTriggerBot(this, gfx, cursorPos);
 		_ = Windows.DrawEsp(this, gfx, cursorPos);
 		
 		Windows.DrawWatermark(this, gfx, cursorPos);
-		Settings.DrawSettings(this, gfx, cursorPos);
+		// Settings.DrawSettings(this, gfx, cursorPos);
+		Menu.DrawMenu(this, gfx, cursorPos);
+		
+		ProcessHelper.UpdateKeys();
 	}
 
 	public static System.Drawing.Point GetCursorPosition()

@@ -2,7 +2,8 @@ using Newtonsoft.Json;
 
 public static class Config
 {
-    public static string MenuKey = "Insert";
+    // public static string MenuKey = "Insert";
+    public static int MenuKey = 0x2D;
 
     public static class TriggerBot
     {
@@ -11,7 +12,7 @@ public static class Config
         public static bool FriendlyFire = false;
         public static int ShotDelay = 70;
         public static int DelayBetweenShots = 160;
-        public static string Key = "LAlt";
+        public static int Key = 0x12;
     }
 
     public static class Esp
@@ -24,12 +25,14 @@ public static class Config
     public static class Aimbot
     {
         public static bool Enabled = true;
+        public static bool ControlRecoil = true;
         public static bool OnKey = true;
         public static bool DrawFOV = true;
         public static bool FriendlyFire = false;
-        public static string Key = "LAlt";
+        public static int Key = 0x12;
         public static string Bone = "head";
         public static float Smooth = 0.25f;
+        public static string SmoothingMethod = "Linear";
         public static float Fov = 50;
     }
 
@@ -59,6 +62,7 @@ public static class Config
 
                 Aimbot.FriendlyFire = config.Aimbot.FriendlyFire;
                 Aimbot.OnKey = config.Aimbot.OnKey;
+                Aimbot.ControlRecoil = config.Aimbot.ControlRecoil;
                 Aimbot.DrawFOV = config.Aimbot.DrawFOV;
                 Aimbot.Enabled = config.Aimbot.Enabled;
                 Aimbot.Key = config.Aimbot.Key;
@@ -123,7 +127,7 @@ public static class Config
 
     private class ConfigFile
     {
-        public string MenuKey { get; set; } = "Insert";
+        public int MenuKey { get; set; } = 0x2D;
         public TriggerBotConfig TriggerBot { get; set; } = new TriggerBotConfig();
         public EspConfig Esp { get; set; } = new EspConfig();
         public AimbotConfig Aimbot { get; set; } = new AimbotConfig();
@@ -136,7 +140,7 @@ public static class Config
         public bool FriendlyFire { get; set; }
         public int ShotDelay { get; set; }
         public int DelayBetweenShots { get; set; }
-        public string Key { get; set; } = "LAlt";
+        public int Key { get; set; } = 0x12;
     }
 
     private class EspConfig
@@ -150,9 +154,10 @@ public static class Config
     {
         public bool Enabled { get; set; } = true;
         public bool OnKey { get; set; } = true;
+        public bool ControlRecoil { get; set; } = true;
         public bool DrawFOV { get; set; } = true;
         public bool FriendlyFire { get; set; }
-        public string Key { get; set; } = "LAlt";
+        public int Key { get; set; } = 0x12;
         public string Bone { get; set; } = "head";
         public float Smooth { get; set; } = 0.25f;
         public float Fov { get; set; } = 50;
