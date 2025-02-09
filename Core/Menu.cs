@@ -22,6 +22,10 @@ public class Menu
     private static int _aimbotSmoothingSmoothingMethodScrollPos = 0;
     private static bool _aimbotBoneOpen = false;
     private static int _aimbotBoneScrollPos = 0;
+    
+    private static string _selectedConfig = "";
+    private static string _configName = "";
+    private static int _configListScrollPos = 0;
 
     private static bool _holdingMenu = false;
     private static Vector2 _holdingMenuOffset = Vector2.Zero;
@@ -71,9 +75,15 @@ public class Menu
     {
         Windows.DrawRoundedRectangle(gfx, _x, _y, _width, _height, overlay.colors["background-dark"], _roundiness);
         Windows.DrawRoundedRectangle(gfx, _x + _leftPanelSize, _y + _headerSize, _width - _leftPanelSize, _height - _headerSize, overlay.colors["background-light"], _roundiness);
+        
+        // draw line between header and left panel
+        gfx.DrawLine(overlay.colors["background-light2"], _x + _leftPanelSize, _y + _headerSize, _x + _leftPanelSize, _y + _height, 1);
+
+        // draw line between header and content
+        gfx.DrawLine(overlay.colors["background-light2"], _x, _y + _headerSize, _x + _width, _y + _headerSize, 1);
 
         var textSize = gfx.MeasureString(overlay.fonts["consolas2"], 24, _menuName);
-        gfx.DrawText(overlay.fonts["consolas2"], 24, overlay.colors["white2"], _x + (_leftPanelSize/2) - (int)textSize.X/2, _y + (_headerSize/2) - (int)textSize.Y/2, _menuName);
+        gfx.DrawText(overlay.fonts["consolas2"], 24, overlay.colors["white2"], _x + 20, _y + (_headerSize/2) - (int)textSize.Y/2, _menuName);
     }
 
     private static void MoveMenu()
@@ -163,6 +173,9 @@ public class Menu
 
     private static void DrawAimbotPanel(Graphics gfx, Overlay overlay)
     {
+        Windows.InteractSelect("Smoothing method", _x + _leftPanelSize + 20, _y + _headerSize + 425, _width - _leftPanelSize - 40, ref Config.Aimbot.SmoothingMethod, Aimbot.SmoothingMethods.Keys.ToList(), ref _aimbotSmoothingSmoothingMethodOpen, ref _aimbotSmoothingSmoothingMethodScrollPos, 5, overlay, gfx);
+        Windows.InteractSelect("Bone", _x + _leftPanelSize + 20, _y + _headerSize + 105, _width - _leftPanelSize - 40, ref Config.Aimbot.Bone, Entity.BoneOffsets.Keys.ToList(), ref _aimbotBoneOpen, ref _aimbotBoneScrollPos, 5, overlay, gfx);
+
         var smoothEnabled = Config.Aimbot.Smooth > 0;
         var sectionHeight = 315 + (smoothEnabled ? 105 : 0) + (Config.Aimbot.OnKey ? 55 : 0);
         DrawSection(
@@ -200,7 +213,7 @@ public class Menu
             Config.Aimbot.Smooth = Math.Max(0.01f, Config.Aimbot.Smooth);
 
             Windows.DrawSlider("Smooth", _x + _leftPanelSize + 20, _y + _headerSize + (y+=30), _width - _leftPanelSize - 40, ref Config.Aimbot.Smooth, 0, 1, overlay, gfx);
-            Windows.DrawSelect("Smoothing method", _x + _leftPanelSize + 20, _y + _headerSize + (y+=45), _width - _leftPanelSize - 40, ref Config.Aimbot.SmoothingMethod, Aimbot.SmoothingMethods.Keys.ToList(), ref _aimbotSmoothingSmoothingMethodOpen, ref _aimbotSmoothingSmoothingMethodScrollPos, 5, overlay, gfx);
+            Windows.DrawSelect("Smoothing method", _x + _leftPanelSize + 20, _y + _headerSize + 425, _width - _leftPanelSize - 40, ref Config.Aimbot.SmoothingMethod, Aimbot.SmoothingMethods.Keys.ToList(), ref _aimbotSmoothingSmoothingMethodOpen, ref _aimbotSmoothingSmoothingMethodScrollPos, 5, overlay, gfx);
         }
         else
         {
@@ -263,7 +276,7 @@ public class Menu
     // draw 2 buttons: save and load
     private static void DrawConfigPanel(Graphics gfx, Overlay overlay)
     {
-        var sectionHeight = 170;
+        var sectionHeight = 345;
         DrawSection(
             gfx, overlay,
             text: "Config",
@@ -276,18 +289,33 @@ public class Menu
         var y = 15;
 
         Windows.DrawKeySelect("Menu key", _x + _leftPanelSize + 20, _y + _headerSize + (y+=30), _width - _leftPanelSize - 40, ref Config.MenuKey, ref _aimbotSelectingKey, overlay, gfx);
-        Windows.DrawButton("Save config", _x + _leftPanelSize + 20, _y + _headerSize + 55 + 45, _width - _leftPanelSize - 40, 30, overlay, gfx);
-        Windows.DrawButton("Load config", _x + _leftPanelSize + 20, _y + _headerSize + 55 + 85, _width - _leftPanelSize - 40, 30, overlay, gfx);
-    
-        if (MouseHelper.WasMousePressed(MouseKey.Left))
+        Windows.DrawInput("Config name", _x + _leftPanelSize + 20, _y + _headerSize + (y+=55), _width - _leftPanelSize - 140, ref _configName, overlay, gfx);
+        _configName = _configName.Substring(0, Math.Min(_configName.Length, 20));
+        
+        Windows.DrawButton("Save config", _x + _leftPanelSize + 20 + (_width - _leftPanelSize - 132), _y + _headerSize + y + 20, 92, 27, overlay, gfx);
+
+        if (Windows.IsMouseInPosition(_x + _leftPanelSize + 20 + (_width - _leftPanelSize - 132), _y + _headerSize + y + 20, 92, 27) && MouseHelper.WasMousePressed(MouseKey.Left))
         {
-            if (Windows.IsMouseInPosition(_x + _leftPanelSize + 20, _y + _headerSize + 55 + 45, _width - _leftPanelSize - 40, 30))
+            if (string.IsNullOrEmpty(_configName))
+                Notifications.AddNotification("Config", "Please enter a config name", NotificationType.Danger);
+            else
             {
-                Config.SaveConfig();
+                Config.SaveConfig(_configName);
+                Notifications.AddNotification("Config", $"Config '{_configName}' saved", NotificationType.Success);
             }
-            else if (Windows.IsMouseInPosition(_x + _leftPanelSize + 20, _y + _headerSize + 55 + 85, _width - _leftPanelSize - 40, 30))
+        }
+
+        Windows.DrawList("Config", _x + _leftPanelSize + 20, _y + _headerSize + (y+=55), _width - _leftPanelSize - 40, Config.GetConfigList(), ref _selectedConfig, 5, ref _configListScrollPos, overlay, gfx);
+        Windows.DrawButton("Load config", _x + _leftPanelSize + 20, _y + _headerSize + y + 160, _width - _leftPanelSize - 40, 27, overlay, gfx);
+    
+        if (Windows.IsMouseInPosition(_x + _leftPanelSize + 20, _y + _headerSize + y + 160, _width - _leftPanelSize - 40, 27) && MouseHelper.WasMousePressed(MouseKey.Left))
+        {
+            if (string.IsNullOrEmpty(_selectedConfig))
+                Notifications.AddNotification("Config", "Please select a config", NotificationType.Danger);
+            else
             {
-                Config.LoadConfig();
+                Config.LoadConfig(_selectedConfig);
+                Notifications.AddNotification("Config", $"Config '{_selectedConfig}' loaded", NotificationType.Success);
             }
         }
     }

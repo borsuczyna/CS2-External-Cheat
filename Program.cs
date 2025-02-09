@@ -4,7 +4,7 @@ class Program
 {
     static void Main()
     {
-        Config.LoadConfig();
+        // Config.LoadConfig();
         Globals.Initialize();
     }
 }

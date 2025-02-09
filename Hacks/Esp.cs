@@ -11,7 +11,11 @@ public class Esp
     {
         var localPlayer = Globals.MemoryReader!.GetLocalPlayer();
         if (localPlayer == null)
+        {
+            Globals.MemoryReader.UpdateModules();
+            await Loop(overlay, gfx);
             return;
+        }
 
         var entities = Globals.MemoryReader!.GetEntities();
         var viewMatrix = Globals.MemoryReader!.GetViewMatrix();

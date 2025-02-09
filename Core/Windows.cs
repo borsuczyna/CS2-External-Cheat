@@ -236,11 +236,6 @@ public class Windows
         var size = gfx.MeasureString(overlay.fonts["arial"], 14, value);
         gfx.DrawText(overlay.fonts["arial"], 14, textColor, x + 10, y + height / 2 - size.Y / 2, value);
 
-        if (IsMouseInPosition(x, y, width, height) && MouseHelper.WasMousePressed(MouseKey.Left))
-        {
-            open = !open;
-        }
-
         if (open)
         {
             DrawRoundedRectangle(gfx, x, y + height, width, height * Math.Min(values.Count, maxOptionsVisibleAtOnce), overlay.colors["background-light2"], 4);
@@ -255,12 +250,6 @@ public class Windows
                 
                 var size2 = gfx.MeasureString(overlay.fonts["arial"], 14, values[i]);
                 gfx.DrawText(overlay.fonts["arial"], 14, overlay.colors["white2"], x + 10, y + height * (i - openScroll + 1) + height / 2 - size2.Y / 2, values[i]);
-
-                if (overOption && MouseHelper.WasMousePressed(MouseKey.Left))
-                {
-                    value = values[i];
-                    open = false;
-                }
             }
 
             var scrollPos = (ProcessHelper.GetAsyncKeyState(0x26) == 0 ? 0 : -1) + (ProcessHelper.GetAsyncKeyState(0x28) == 0 ? 0 : 1);
@@ -271,16 +260,45 @@ public class Windows
             }
             
             // DRAW TEXT "use arrow keys to scroll"
-            var scrollText = "Use arrow keys to scroll (⮝/⮟)";
-            var scrollTextSize = gfx.MeasureString(overlay.fonts["arial"], 14, scrollText);
-            gfx.DrawText(overlay.fonts["arial"], 14, overlay.colors["white2"], x + width / 2 - scrollTextSize.X / 2, y + height * (Math.Min(values.Count, maxOptionsVisibleAtOnce) + 1) + 5, scrollText);
+            // var scrollText = "Use arrow keys to scroll (⮝/⮟)";
+            // var scrollTextSize = gfx.MeasureString(overlay.fonts["arial"], 14, scrollText);
+            // gfx.DrawText(overlay.fonts["arial"], 14, overlay.colors["white2"], x + width / 2 - scrollTextSize.X / 2, y + height * (Math.Min(values.Count, maxOptionsVisibleAtOnce) + 1) + 5, scrollText);
+        
+            DrawScroll(text, x + width + 2, y + height, 5, height * Math.Min(values.Count, maxOptionsVisibleAtOnce), ref openScroll, maxOptionsVisibleAtOnce, values.Count, overlay, gfx);
+        }
+    }
+
+    public static void InteractSelect(string text, int x, int y, int width, ref string value, List<string> values, ref bool open, ref int openScroll, int maxOptionsVisibleAtOnce, Overlay overlay, Graphics gfx)
+    {
+        var height = 26;
+        var sizeHeight = gfx.MeasureString(overlay.fonts["arial"], 14, text).Y;
+
+        y += (int)sizeHeight + 5;
+        
+        if (IsMouseInPosition(x, y, width, height) && MouseHelper.WasMousePressed(MouseKey.Left))
+        {
+            open = !open;
+        }
+
+        if (open)
+        {
+            for (var i = openScroll; i < Math.Min(values.Count, openScroll + maxOptionsVisibleAtOnce); i++)
+            {
+                var overOption = IsMouseInPosition(x, y + height * (i - openScroll + 1), width, height);
+
+                if (overOption && MouseHelper.WasMousePressed(MouseKey.Left))
+                {
+                    value = values[i];
+                    open = false;
+                }
+            }
         }
     }
 
     public static void DrawButton(string text, int x, int y, int width, int height, Overlay overlay, Graphics gfx)
     {
         var mouseOver = IsMouseInPosition(x, y, width, height);
-        var color = mouseOver ? overlay.colors["background-light2"] : overlay.colors["background-light"];
+        var color = mouseOver ? overlay.colors["background-light3"] : overlay.colors["background-light2"];
         var textColor = mouseOver ? overlay.colors["white2"] : overlay.colors["white3"];
 
         DrawRoundedRectangle(gfx, x, y, width, height, color, 4);
@@ -328,6 +346,158 @@ public class Windows
                         key = i;
                         selectingKey = false;
                         break;
+                    }
+                }
+            }
+        }
+    }
+
+    public static void DrawList(string text, int x, int y, int width, List<string> values, ref string selectedValue, int maxOptionsVisibleAtOnce, ref int scroll, Overlay overlay, Graphics gfx)
+    {
+        if (values.Count == 0)
+        {
+            values.Add("Nothing to show.");
+        }
+
+        var height = 26;
+        var sizeHeight = gfx.MeasureString(overlay.fonts["arial"], 14, text).Y;
+        var totalBoxHeight = height * maxOptionsVisibleAtOnce;
+
+        gfx.DrawText(overlay.fonts["arial"], 14, overlay.colors["white2"], x, y, text);
+
+        y += (int)sizeHeight + 5;
+        DrawRoundedRectangle(gfx, x, y, width - 7, totalBoxHeight, overlay.colors["background-light2"], 4);
+
+        for (var i = scroll; i < Math.Min(values.Count, scroll + maxOptionsVisibleAtOnce); i++)
+        {
+            var overOption = IsMouseInPosition(x, y + height * (i - scroll), width - 7, height);
+
+            if (overOption)
+                DrawRoundedRectangle(gfx, x, y + height * (i - scroll), width - 7, height, overlay.colors["background-light3"], 4);
+
+            if (selectedValue == values[i])
+                DrawRoundedRectangle(gfx, x, y + height * (i - scroll), width - 7, height, overlay.colors["background-light4"], 4); 
+            
+            var size2 = gfx.MeasureString(overlay.fonts["arial"], 14, values[i]);
+            gfx.DrawText(overlay.fonts["arial"], 14, overlay.colors["white2"], x + 10, y + height * (i - scroll) + height / 2 - size2.Y / 2, values[i]);
+
+            if (overOption && MouseHelper.WasMousePressed(MouseKey.Left) && values[i] != "Nothing to show.")
+            {
+                selectedValue = values[i];
+            }
+        }
+
+        DrawScroll(text, x + width - 5, y, 5, totalBoxHeight, ref scroll, maxOptionsVisibleAtOnce, values.Count, overlay, gfx);
+    }
+
+    private static string? _holdingScrollKey;
+    private static int _holdingScrollPos;
+    
+    public static void DrawScroll(string key, int x, int y, int w, int h, ref int progress, int maxView, int max, Overlay overlay, Graphics gfx)
+    {
+        max -= maxView;
+        max = Math.Max(max, 1);
+        maxView = Math.Max(maxView, 1);
+
+        var scrollHeight = (int)((float)maxView / max * h);
+        scrollHeight = Math.Clamp(scrollHeight, 10, h);
+
+        var scrollY = (int)((float)progress / max * (h - scrollHeight));
+        scrollY = Math.Clamp(scrollY, 0, h - scrollHeight);
+
+        var mouseOver = IsMouseInPosition(x, y + scrollY, w, scrollHeight);
+
+        DrawRoundedRectangle(gfx, x, y, w, h, overlay.colors["background-light2"], 2);
+        DrawRoundedRectangle(gfx, x, y + scrollY, w, scrollHeight, mouseOver ? overlay.colors["active"] : overlay.colors["active-dark"], 2);
+
+        var cursorPos = Overlay.GetCursorPosition();
+
+        if (_holdingScrollKey == null && mouseOver && MouseHelper.WasMousePressed(MouseKey.Left))
+        {
+            _holdingScrollKey = key;
+            _holdingScrollPos = cursorPos.Y - y - scrollY;
+        }
+
+        if (_holdingScrollKey == key)
+        {
+            progress = (int)((cursorPos.Y - y - _holdingScrollPos) / (float)(h - scrollHeight) * max);
+            progress = Math.Clamp(progress, 0, Math.Max(0, max - maxView));
+            
+            if (!MouseHelper.IsMouseDown(MouseKey.Left))
+            {
+                _holdingScrollKey = null;
+            }
+        }
+    }
+
+    private static string? _activeInputKey;
+
+    public static void DrawInput(string key, int x, int y, int width, ref string value, Overlay overlay, Graphics gfx)
+    {
+        var drawValue = value;
+        if (_activeInputKey == key)
+        {
+            var carret = (_activeInputKey == key && (DateTime.Now.Millisecond % 600) < 300) ? "|" : "";
+            drawValue += carret;
+        }
+        else if (string.IsNullOrEmpty(value))
+        {
+            drawValue = key;
+        }
+
+        gfx.DrawText(overlay.fonts["arial"], 14, overlay.colors["white2"], x, y, key);
+
+        var sizeHeight = gfx.MeasureString(overlay.fonts["arial"], 14, key).Y;
+        y += (int)sizeHeight + 5;
+        
+        var height = 26;
+        var mouseOver = IsMouseInPosition(x, y, width, height);
+        var textColor = (mouseOver || _activeInputKey == key) ? overlay.colors["white2"] : overlay.colors["white3"];
+
+        DrawRoundedRectangle(gfx, x, y, width, height, overlay.colors["background-light2"], 4);
+        DrawRoundedStrokeRectangle(gfx, x, y, width, height, overlay.colors["background-light3"], 1, 4);
+        
+        var size = gfx.MeasureString(overlay.fonts["arial"], 14, drawValue);
+        gfx.DrawText(overlay.fonts["arial"], 14, textColor, x + 10, y + height / 2 - size.Y / 2, drawValue);
+
+        if (mouseOver && MouseHelper.WasMousePressed(MouseKey.Left))
+        {
+            _activeInputKey = key;
+        }
+        else if (!mouseOver && _activeInputKey == key && MouseHelper.IsMouseDown(MouseKey.Left))
+        {
+            _activeInputKey = null;
+        }
+
+        if (_activeInputKey == key)
+        {
+            var chars = new List<string>() {
+                "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M",
+                "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+                "0", "1", "2", "3", "4", "5", "6", "7", "8", "9",
+                "!", "@", "#", "$", "%", "^", "&", "*", "(", ")", "-", "_", "+", "=", "{", "}", "[", "]", "|", "\\", ":", ";", "'", "\"", "<", ">", ",", ".", "?", "/", " ", "Backspace", "Enter"
+            };
+
+            var isCapsLock = (ProcessHelper.GetKeyState(0x14) & 0x0001) != 0;
+
+            foreach (var c in chars)
+            {
+                if (ProcessHelper.WasKeyPressed(c.ToString()))
+                {
+                    if (c == "Backspace")
+                    {
+                        if (value.Length > 0)
+                        {
+                            value = value.Substring(0, value.Length - 1);
+                        }
+                    }
+                    else if (c == "Enter")
+                    {
+                        _activeInputKey = null;
+                    }
+                    else
+                    {
+                        value += isCapsLock ? c : c.ToLower();
                     }
                 }
             }

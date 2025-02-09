@@ -96,7 +96,6 @@ public class MouseHelper
 
     public static bool WasMousePressed(MouseKey key)
     {
-        // return _mouseDownCache.Any(x => x.Key == key && !x.Checked && x.Time > DateTime.Now.AddMilliseconds(-100));
         var cache = _mouseDownCache.FirstOrDefault(x => x.Key == key && !x.Checked && x.Time > DateTime.Now.AddMilliseconds(-100));
         if (cache == null) return false;
 

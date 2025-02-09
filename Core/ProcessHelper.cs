@@ -34,6 +34,9 @@ public static class ProcessHelper
     [DllImport("user32.dll")]
     public static extern short GetAsyncKeyState(int vKey);
 
+    [DllImport("user32.dll", CharSet = CharSet.Auto, ExactSpelling = true, CallingConvention = CallingConvention.Winapi)]
+    public static extern short GetKeyState(int keyCode);
+
     public static Dictionary<string, int> keyMap = new Dictionary<string, int>
     {
         { "LButton", 0x01 },       // Left mouse button
@@ -154,10 +157,27 @@ public static class ProcessHelper
         { "BrowserForward", 0xA7 }
     };
 
+    private class KeyDownCache
+    {
+        public string Key { get; set; } = "";
+        public DateTime Time { get; set; }
+        public bool Checked { get; set; }
+    }
+
+    private static List<KeyDownCache> keyDownCache = new List<KeyDownCache>();
+
     public static string GetKeyName(int vKey)
     {
-        // return keyMap.FirstOrDefault(x => x.Value == vKey).Key;
         return keyMap.ContainsValue(vKey) ? keyMap.FirstOrDefault(x => x.Value == vKey).Key : $"0x{vKey:X}";
+    }
+
+    public static bool WasKeyPressed(string key)
+    {
+        var cache = keyDownCache.FirstOrDefault(x => x.Key == key && !x.Checked && x.Time > DateTime.Now.AddMilliseconds(-100));
+        if (cache == null) return false;
+
+        cache.Checked = true;
+        return true;
     }
 
     public static bool IsKeyDown(int key)
@@ -233,12 +253,16 @@ public static class ProcessHelper
         }
     }
 
-    public static void UpdateKeys()
+    public static void UpdateKeyDowns()
     {
-        for (int i = 0; i < 256; i++)
+        foreach (var key in keyMap)
         {
-            IsKeyDown(i);
+            if (IsKeyDown(key.Value) && !keyDownCache.Any(x => x.Key == key.Key))
+                keyDownCache.Add(new KeyDownCache { Key = key.Key, Time = DateTime.Now, Checked = false });
         }
+
+        // remove all that are not down
+        keyDownCache.RemoveAll(x => IsKeyDown(keyMap[x.Key]) == false);
     }
 }
 

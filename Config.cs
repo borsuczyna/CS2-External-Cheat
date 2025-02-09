@@ -36,13 +36,17 @@ public static class Config
         public static float Fov = 50;
     }
 
-    public static void LoadConfig()
+    public static void LoadConfig(string name)
     {
         try
         {
-            if (File.Exists("config.json"))
+            var configName = $"configs/{name}.json";
+            if (!Directory.Exists("configs"))
+                Directory.CreateDirectory("configs");
+
+            if (File.Exists(configName))
             {
-                var json = File.ReadAllText("config.json");
+                var json = File.ReadAllText(configName);
                 var config = JsonConvert.DeserializeObject<ConfigFile>(json);
                 if (config == null)
                     throw new Exception("Failed to deserialize config.");
@@ -72,7 +76,7 @@ public static class Config
             }
             else
             {
-                SaveConfig();
+                SaveConfig(name);
             }
         }
         catch (Exception ex)
@@ -81,7 +85,7 @@ public static class Config
         }
     }
 
-    public static void SaveConfig()
+    public static void SaveConfig(string name)
     {
         try
         {
@@ -117,12 +121,32 @@ public static class Config
             };
 
             var json = JsonConvert.SerializeObject(config, Formatting.Indented);
-            File.WriteAllText("config.json", json);
+
+            var configName = $"configs/{name}.json";
+            if (!Directory.Exists("configs"))
+                Directory.CreateDirectory("configs");
+            
+            File.WriteAllText(configName, json);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Failed to save config: {ex.Message}");
         }
+    }
+
+    public static List<string> GetConfigList()
+    {
+        var configs = new List<string>();
+        if (!Directory.Exists("configs"))
+            Directory.CreateDirectory("configs");
+
+        foreach (var file in Directory.GetFiles("configs"))
+        {
+            var name = Path.GetFileNameWithoutExtension(file);
+            configs.Add(name);
+        }
+
+        return configs;
     }
 
     private class ConfigFile

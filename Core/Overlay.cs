@@ -12,6 +12,7 @@ public class Overlay : IDisposable
 	public readonly DateTime _start = DateTime.Now;
 	public static Graphics? gfx;
 
+	// colors
 	public readonly Dictionary<string, SolidBrush> colors;
 	private readonly Dictionary<string, (int, int, int, int?)> _colorsToLoad = new()
 	{
@@ -28,24 +29,47 @@ public class Overlay : IDisposable
 		["background-light"] = (33, 35, 38, 255),
 		["background-light2"] = (40, 42, 45, 255),
 		["background-light3"] = (50, 53, 57, 255),
+		["background-light4"] = (60, 63, 68, 255),
 		["background-hover"] = (45, 48, 54, 255),
 		["background-hover-transparent"] = (45, 48, 54, 155),
-		["active"] = (113, 213, 255, 255),
-		["active-dark"] = (88, 192, 240, 255),
+		["active"] = (255, 0, 128, 255),
+		["active-dark"] = (217, 0, 83, 255),
+
+		// notifications: danger, success, warning, info
+		["notification-success"] = (199, 255, 129, 255),
+		["notification-success-transparent"] = (0, 255, 0, 155),
+		["notification-danger"] = (255, 78, 78, 255),
+		["notification-danger-transparent"] = (255, 78, 78, 155),
+		["notification-warning"] = (255, 152, 78, 255),
+		["notification-warning-transparent"] = (255, 152, 78, 155),
+		["notification-info"] = (129, 194, 255, 255),
+		["notification-info-transparent"] = (129, 194, 255, 155),
+	};
+
+	// gradients
+	public readonly Dictionary<string, LinearGradientBrush> gradients;
+	private readonly Dictionary<string, int[]> _gradientsToLoad = new()
+	{
+		["notification-success"] = [40, 63, 52, 236, 58, 64, 59, 255],
+		["notification-danger"] = [63, 47, 43, 236, 64, 58, 58, 255],
+		["notification-warning"] = [64, 54, 40, 236, 64, 61, 58, 255],
+		["notification-info"] = [40, 56, 64, 236, 58, 61, 64, 255],
 	};
 
 	public readonly Dictionary<string, Font> fonts;
-	private readonly Dictionary<string, (string, int)> _fontsToLoad = new()
+	private readonly Dictionary<string, (string, int, bool)> _fontsToLoad = new()
 	{
-		["consolas"] = ("Consolas", 14),
-		["consolas2"] = ("Consolas", 30),
-		["arial"] = ("Arial", 24),
+		["consolas"] = ("Consolas", 14, false),
+		["consolas2"] = ("Consolas", 30, false),
+		["arial"] = ("Arial", 24, false),
+		["arial-bold"] = ("Arial", 24, true),
 	};
 
 	public Overlay(string processName)
 	{
 		colors = new Dictionary<string, SolidBrush>();
 		fonts = new Dictionary<string, Font>();
+		gradients = new Dictionary<string, LinearGradientBrush>();
 
 		// var notepad = System.Diagnostics.Process.GetProcessesByName("cs2")[0].MainWindowHandle;
 		_process = System.Diagnostics.Process.GetProcessesByName(processName)[0];
@@ -94,6 +118,7 @@ public class Overlay : IDisposable
 
 		// Create new resources
 		LoadColors(gfx);
+		LoadGradients(gfx);
 
 		if (e.RecreateResources) return;	
 
@@ -124,10 +149,10 @@ public class Overlay : IDisposable
 		_ = Windows.DrawEsp(this, gfx, cursorPos);
 		
 		Windows.DrawWatermark(this, gfx, cursorPos);
-		// Settings.DrawSettings(this, gfx, cursorPos);
 		Menu.DrawMenu(this, gfx, cursorPos);
+		Notifications.Draw(this, gfx, cursorPos);
 		
-		ProcessHelper.UpdateKeys();
+		ProcessHelper.UpdateKeyDowns();
 	}
 
 	public static System.Drawing.Point GetCursorPosition()
@@ -141,7 +166,7 @@ public class Overlay : IDisposable
 	{
 		foreach (var font in _fontsToLoad)
 		{
-			fonts[font.Key] = gfx.CreateFont(font.Value.Item1, font.Value.Item2);
+			fonts[font.Key] = gfx.CreateFont(font.Value.Item1, font.Value.Item2, font.Value.Item3);
 		}
 	}
 
@@ -150,6 +175,20 @@ public class Overlay : IDisposable
 		foreach (var pair in _colorsToLoad)
 		{	
 			colors[pair.Key] = gfx.CreateSolidBrush(pair.Value.Item1, pair.Value.Item2, pair.Value.Item3, pair.Value.Item4 ?? 255);
+		}
+	}
+
+	private void LoadGradients(Graphics gfx)
+	{
+		foreach (var pair in _gradientsToLoad)
+		{
+			var colors = new Color[pair.Value.Length / 4];
+			for (var i = 0; i < pair.Value.Length; i += 4)
+			{
+				colors[i / 4] = new Color(pair.Value[i], pair.Value[i + 1], pair.Value[i + 2], pair.Value[i + 3]);
+			}
+
+			gradients[pair.Key] = new LinearGradientBrush(gfx, colors);
 		}
 	}
 
