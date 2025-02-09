@@ -145,6 +145,7 @@ public class Overlay : IDisposable
 		MouseHelper.UpdateMouseDowns();
 		_ = Windows.UseBaseHack(this, gfx, cursorPos);
 		_ = Windows.UseAimbot(this, gfx, cursorPos);
+		_ = Windows.UseRecoilControl(this, gfx, cursorPos);
 		_ = Windows.UseTriggerBot(this, gfx, cursorPos);
 		_ = Windows.DrawEsp(this, gfx, cursorPos);
 		

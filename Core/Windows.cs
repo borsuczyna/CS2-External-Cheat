@@ -29,6 +29,11 @@ public class Windows
         await Aimbot.Loop(overlay, gfx);
     }
 
+    public static async Task UseRecoilControl(Overlay overlay, Graphics gfx, System.Drawing.Point cursorPos)
+    {
+        await RecoilControl.Loop(overlay, gfx);
+    }
+
     public static async Task UseTriggerBot(Overlay overlay, Graphics gfx, System.Drawing.Point cursorPos)
     {
         await TriggerBot.Loop();

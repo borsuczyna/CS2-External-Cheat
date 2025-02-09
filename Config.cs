@@ -2,12 +2,11 @@ using Newtonsoft.Json;
 
 public static class Config
 {
-    // public static string MenuKey = "Insert";
     public static int MenuKey = 0x2D;
 
     public static class TriggerBot
     {
-        public static bool Enabled = true;
+        public static bool Enabled = false;
         public static bool OnKey = true;
         public static bool FriendlyFire = false;
         public static int ShotDelay = 70;
@@ -18,22 +17,30 @@ public static class Config
     public static class Esp
     {
         public static bool Box = false;
-        public static bool Bones = true;
+        public static bool Bones = false;
         public static bool FriendlyFire = false;
     }
 
     public static class Aimbot
     {
-        public static bool Enabled = true;
+        public static bool Enabled = false;
         public static bool ControlRecoil = true;
         public static bool OnKey = true;
         public static bool DrawFOV = true;
         public static bool FriendlyFire = false;
         public static int Key = 0x12;
         public static string Bone = "head";
-        public static float Smooth = 0.25f;
+        public static float Smooth = 0f;
         public static string SmoothingMethod = "Linear";
         public static float Fov = 50;
+    }
+
+    public static class RecoilControl
+    {
+        public static bool Enabled = false;
+        public static bool OnKey = false;
+        public static int Key = 0x12;
+        public static float Smooth = 0f;
     }
 
     public static void LoadConfig(string name)
@@ -73,6 +80,11 @@ public static class Config
                 Aimbot.Bone = config.Aimbot.Bone;
                 Aimbot.Smooth = config.Aimbot.Smooth;
                 Aimbot.Fov = config.Aimbot.Fov;
+
+                RecoilControl.Enabled = config.RecoilControl.Enabled;
+                RecoilControl.OnKey = config.RecoilControl.OnKey;
+                RecoilControl.Key = config.RecoilControl.Key;
+                RecoilControl.Smooth = config.RecoilControl.Smooth;
             }
             else
             {
@@ -155,11 +167,12 @@ public static class Config
         public TriggerBotConfig TriggerBot { get; set; } = new TriggerBotConfig();
         public EspConfig Esp { get; set; } = new EspConfig();
         public AimbotConfig Aimbot { get; set; } = new AimbotConfig();
+        public RecoilControlConfig RecoilControl { get; set; } = new RecoilControlConfig();
     }
 
     private class TriggerBotConfig
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
         public bool OnKey { get; set; } = true;
         public bool FriendlyFire { get; set; }
         public int ShotDelay { get; set; }
@@ -176,14 +189,22 @@ public static class Config
 
     private class AimbotConfig
     {
-        public bool Enabled { get; set; } = true;
+        public bool Enabled { get; set; } = false;
         public bool OnKey { get; set; } = true;
         public bool ControlRecoil { get; set; } = true;
         public bool DrawFOV { get; set; } = true;
         public bool FriendlyFire { get; set; }
         public int Key { get; set; } = 0x12;
         public string Bone { get; set; } = "head";
-        public float Smooth { get; set; } = 0.25f;
+        public float Smooth { get; set; } = 0f;
         public float Fov { get; set; } = 50;
+    }
+
+    private class RecoilControlConfig
+    {
+        public bool Enabled { get; set; } = false;
+        public bool OnKey { get; set; }
+        public int Key { get; set; } = 0x12;
+        public float Smooth { get; set; } = 0f;
     }
 }

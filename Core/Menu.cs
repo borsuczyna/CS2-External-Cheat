@@ -32,7 +32,7 @@ public class Menu
 
     private static Dictionary<string, List<string>> _menuPanels = new()
     {
-        ["Combat"] = new() { "Aimbot", "Triggerbot" },
+        ["Combat"] = new() { "Aimbot", "Triggerbot", "Recoil control" },
         ["Visuals"] = new() { "Players" },
         ["Menu"] = new() { "Config" },
     };
@@ -66,6 +66,8 @@ public class Menu
         else if (_currentPanel == 1)
             DrawTriggerbotPanel(gfx, overlay);
         else if (_currentPanel == 2)
+            DrawRecoilControlPanel(gfx, overlay);
+        else if (_currentPanel == 3)
             DrawVisualsPanel(gfx, overlay);
         else
             DrawConfigPanel(gfx, overlay);
@@ -253,6 +255,36 @@ public class Menu
 
         Windows.DrawSlider("Shot delay", _x + _leftPanelSize + 20, _y + _headerSize + y, _width - _leftPanelSize - 40, ref Config.TriggerBot.ShotDelay, 0, 1000, overlay, gfx);
         Windows.DrawSlider("Delay between shots", _x + _leftPanelSize + 20, _y + _headerSize + (y+=45), _width - _leftPanelSize - 40, ref Config.TriggerBot.DelayBetweenShots, 0, 1000, overlay, gfx);
+    }
+
+    private static void DrawRecoilControlPanel(Graphics gfx, Overlay overlay)
+    {
+        var sectionHeight = 140 + (Config.RecoilControl.OnKey ? 60 : 0);
+        DrawSection(
+            gfx, overlay,
+            text: "Recoil control",
+            x: _x + _leftPanelSize + 10,
+            y: _y + _headerSize + 10,
+            width: _width - _leftPanelSize - 20,
+            height: sectionHeight
+        );
+
+        var y = 15;
+        Windows.DrawCheckbox("Enable", _x + _leftPanelSize + 20, _y + _headerSize + (y+=30), ref Config.RecoilControl.Enabled, overlay, gfx);
+        Windows.DrawCheckbox("When holding key", _x + _leftPanelSize + 20, _y + _headerSize + (y+=30), ref Config.RecoilControl.OnKey, overlay, gfx);
+
+        if (Config.RecoilControl.OnKey)
+        {
+            y += 30;
+            Windows.DrawKeySelect("Key", _x + _leftPanelSize + 20, _y + _headerSize + y, _width - _leftPanelSize - 40, ref Config.RecoilControl.Key, ref _aimbotSelectingKey, overlay, gfx);
+            y += 55;
+        }
+        else
+        {
+            y += 30;
+        }
+
+        Windows.DrawSlider("Smooth", _x + _leftPanelSize + 20, _y + _headerSize + y, _width - _leftPanelSize - 40, ref Config.RecoilControl.Smooth, 0, 1, overlay, gfx);
     }
 
     private static void DrawVisualsPanel(Graphics gfx, Overlay overlay)
