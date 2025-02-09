@@ -1,6 +1,5 @@
 # CS2 C# External Cheat
-
-![image](https://github.com/user-attachments/assets/766b18c8-d299-4a32-b2a2-4d35ced3155b)
+![image](https://github.com/user-attachments/assets/7b7ae95a-104e-4388-80cf-3dba53f10a53)
 
 This repository contains a Counter-Strike 2 external cheat written in C#. The cheat includes features such as TriggerBot, ESP and Aimbot with automatic offset updates.
 
