@@ -104,17 +104,6 @@ public static class Config
             var config = new ConfigFile
             {
                 MenuKey = MenuKey,
-                Aimbot = new AimbotConfig
-                {
-                    Enabled = Aimbot.Enabled,
-                    OnKey = Aimbot.OnKey,
-                    DrawFOV = Aimbot.DrawFOV,
-                    FriendlyFire = Aimbot.FriendlyFire,
-                    Key = Aimbot.Key,
-                    Bone = Aimbot.Bone,
-                    Smooth = Aimbot.Smooth,
-                    Fov = Aimbot.Fov
-                },
                 TriggerBot = new TriggerBotConfig
                 {
                     Enabled = TriggerBot.Enabled,
@@ -128,7 +117,26 @@ public static class Config
                 {
                     Box = Esp.Box,
                     Bones = Esp.Bones,
-                    FriendlyFire = TriggerBot.FriendlyFire
+                    FriendlyFire = Esp.FriendlyFire
+                },
+                Aimbot = new AimbotConfig
+                {
+                    Enabled = Aimbot.Enabled,
+                    OnKey = Aimbot.OnKey,
+                    ControlRecoil = Aimbot.ControlRecoil,
+                    DrawFOV = Aimbot.DrawFOV,
+                    FriendlyFire = Aimbot.FriendlyFire,
+                    Key = Aimbot.Key,
+                    Bone = Aimbot.Bone,
+                    Smooth = Aimbot.Smooth,
+                    Fov = Aimbot.Fov
+                },
+                RecoilControl = new RecoilControlConfig
+                {
+                    Enabled = RecoilControl.Enabled,
+                    OnKey = RecoilControl.OnKey,
+                    Key = RecoilControl.Key,
+                    Smooth = RecoilControl.Smooth
                 }
             };
 
